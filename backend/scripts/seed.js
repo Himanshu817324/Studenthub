@@ -38,24 +38,32 @@ const seedData = async () => {
             Problem.deleteMany({}),
         ]);
 
-        // Create admin user
-        console.log('👤 Creating admin user...');
+        // Create users
+        console.log('👤 Creating users...');
         const admin = await User.create({
             name: 'Admin User',
             email: 'admin@studenthub.com',
-            passwordHash: 'admin123', // Will be hashed by pre-save hook
+            passwordHash: 'admin123',
             roles: ['user', 'admin'],
             bio: 'Platform administrator',
             oauthProviders: [],
         });
 
-        // Create test user
         const testUser = await User.create({
-            name: 'Test User',
-            email: 'test@example.com',
+            name: 'Alice Johnson',
+            email: 'alice@example.com',
             passwordHash: 'test123',
             roles: ['user'],
-            bio: 'Test user for demo',
+            bio: 'Full-stack developer passionate about React and Node.js',
+            oauthProviders: [],
+        });
+
+        const user3 = await User.create({
+            name: 'Bob Smith',
+            email: 'bob@example.com',
+            passwordHash: 'test123',
+            roles: ['user'],
+            bio: 'Python enthusiast and data science learner',
             oauthProviders: [],
         });
 
@@ -75,35 +83,16 @@ const seedData = async () => {
             slug: 'frontend',
         });
 
-        const uiCssCategory = await Category.create({
-            subdomainId: frontendSubdomain._id,
-            name: 'UI & CSS',
-            slug: 'ui-css',
-        });
-
-        const reactTechStack = await TechStack.create({
-            categoryId: uiCssCategory._id,
-            name: 'React',
-            slug: 'react',
-        });
-
-        const jsLanguage = await Language.create({
-            techStackId: reactTechStack._id,
-            name: 'JavaScript',
-            slug: 'javascript',
-        });
-
-        const stateTopic = await Topic.create({
-            languageId: jsLanguage._id,
-            name: 'State Management',
-            slug: 'state-management',
-        });
-
-        // Backend subdomain
         const backendSubdomain = await Subdomain.create({
             domainId: webDevDomain._id,
             name: 'Backend',
             slug: 'backend',
+        });
+
+        const uiCssCategory = await Category.create({
+            subdomainId: frontendSubdomain._id,
+            name: 'UI & CSS',
+            slug: 'ui-css',
         });
 
         const apiCategory = await Category.create({
@@ -112,10 +101,34 @@ const seedData = async () => {
             slug: 'api-development',
         });
 
+        const reactTechStack = await TechStack.create({
+            categoryId: uiCssCategory._id,
+            name: 'React',
+            slug: 'react',
+        });
+
+        const vueStack = await TechStack.create({
+            categoryId: uiCssCategory._id,
+            name: 'Vue.js',
+            slug: 'vuejs',
+        });
+
         const nodeTechStack = await TechStack.create({
             categoryId: apiCategory._id,
             name: 'Node.js',
             slug: 'nodejs',
+        });
+
+        const jsLanguage = await Language.create({
+            techStackId: reactTechStack._id,
+            name: 'JavaScript',
+            slug: 'javascript',
+        });
+
+        const tsLanguage = await Language.create({
+            techStackId: reactTechStack._id,
+            name: 'TypeScript',
+            slug: 'typescript',
         });
 
         // Data Science Domain
@@ -125,17 +138,53 @@ const seedData = async () => {
             description: 'Data analysis, machine learning, and AI',
         });
 
-        // Update admin interests
-        admin.interests = [webDevDomain._id, dataScienceDomain._id];
-        await admin.save();
+        const mlSubdomain = await Subdomain.create({
+            domainId: dataScienceDomain._id,
+            name: 'Machine Learning',
+            slug: 'machine-learning',
+        });
 
-        testUser.interests = [webDevDomain._id];
-        await testUser.save();
+        const dataAnalysisCategory = await Category.create({
+            subdomainId: mlSubdomain._id,
+            name: 'Data Analysis',
+            slug: 'data-analysis',
+        });
+
+        const pythonStack = await TechStack.create({
+            categoryId: dataAnalysisCategory._id,
+            name: 'Python',
+            slug: 'python',
+        });
+
+        // Mobile Development Domain
+        const mobileDomain = await Domain.create({
+            name: 'Mobile Development',
+            slug: 'mobile-development',
+            description: 'iOS and Android app development',
+        });
+
+        const crossPlatformSubdomain = await Subdomain.create({
+            domainId: mobileDomain._id,
+            name: 'Cross-Platform',
+            slug: 'cross-platform',
+        });
+
+        const mobileFrameworkCategory = await Category.create({
+            subdomainId: crossPlatformSubdomain._id,
+            name: 'Mobile Frameworks',
+            slug: 'mobile-frameworks',
+        });
+
+        const reactNativeStack = await TechStack.create({
+            categoryId: mobileFrameworkCategory._id,
+            name: 'React Native',
+            slug: 'react-native',
+        });
 
         // Create sample problems
         console.log('📝 Creating sample problems...');
 
-        const problem1 = await Problem.create({
+        await Problem.create({
             title: 'State not updating in React due to direct mutation',
             descriptionMarkdown: `# Problem
       
@@ -186,11 +235,10 @@ React uses shallow comparison to detect state changes. When you mutate the objec
             categoryId: uiCssCategory._id,
             techStackId: reactTechStack._id,
             languageId: jsLanguage._id,
-            topicId: stateTopic._id,
         });
 
-        const problem2 = await Problem.create({
-            title: 'CORS errors when calling API from front-end',
+        await Problem.create({
+            title: 'CORS errors when calling API from frontend',
             descriptionMarkdown: `# Problem
 
 When making API calls from your frontend to a backend server, you encounter CORS (Cross-Origin Resource Sharing) errors in the browser console.
@@ -226,11 +274,6 @@ app.use(cors({
 {
   "proxy": "http://localhost:5000"
 }
-\`\`\`
-
-Then use relative URLs in fetch:
-\`\`\`javascript
-fetch('/api/data') // Instead of full URL
 \`\`\``,
             createdBy: testUser._id,
             severity: 'HIGH',
@@ -241,74 +284,74 @@ fetch('/api/data') // Instead of full URL
             downvotes: 3,
             viewCount: 8000,
             tags: ['cors', 'api', 'http', 'security', 'network'],
-            resources: [
-                {
-                    type: 'link',
-                    url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS',
-                    title: 'MDN: CORS',
-                },
-            ],
             domainId: webDevDomain._id,
             subdomainId: frontendSubdomain._id,
             categoryId: uiCssCategory._id,
         });
 
-        const problem3 = await Problem.create({
-            title: 'useEffect running infinitely causing app to crash',
-            descriptionMarkdown: `# Problem
+        await Problem.create({
+            title: 'Vue 3 Composition API vs Options API: When to use which?',
+            descriptionMarkdown: `# Question
 
-The \`useEffect\` hook is running infinitely in a loop, causing the browser to freeze or the app to crash.
+I'm new to Vue 3 and confused about when to use the Composition API versus the traditional Options API. What are the best practices?
 
-## Common Cause
-
-Missing or incorrect dependency array, especially when using objects or arrays as dependencies.
-
-## Example
+## Composition API
 
 \`\`\`javascript
-// ❌ Wrong - Creates infinite loop
-useEffect(() => {
-  const config = { theme: 'dark' };
-  applyConfig(config);
-}, [config]); // Config is recreated every render!
+import { ref, computed } from 'vue';
+
+export default {
+  setup() {
+    const count = ref(0);
+    const doubled = computed(() => count.value * 2);
+    
+    return { count, doubled };
+  }
+}
 \`\`\`
 
-## Solutions
+## Options API
 
-### 1. Use useMemo for object dependencies
 \`\`\`javascript
-const config = useMemo(() => ({ theme: 'dark' }), []);
-
-useEffect(() => {
-  applyConfig(config);
-}, [config]);
+export default {
+  data() {
+    return { count: 0 };
+  },
+  computed: {
+    doubled() {
+      return this.count * 2;
+    }
+  }
+}
 \`\`\`
 
-### 2. Extract values instead of objects
-\`\`\`javascript
-const theme = 'dark';
+## When to Use Each?
 
-useEffect(() => {
-  applyConfig({ theme });
-}, [theme]);
-\`\`\``,
-            createdBy: testUser._id,
-            severity: 'CRITICAL',
+**Use Composition API when:**
+- Building complex components with lots of logic
+- Need to reuse logic across components
+- Using TypeScript (better type inference)
+
+**Use Options API when:**
+- Building simple components
+- Team is more familiar with it
+- Migrating from Vue 2`,
+            createdBy: user3._id,
+            severity: 'MEDIUM',
             difficulty: 'INTERMEDIATE',
             canonical: false,
             solved: false,
             upvotes: 45,
             downvotes: 2,
             viewCount: 1200,
-            tags: ['react', 'hooks', 'useeffect', 'infinite-loop', 'performance'],
+            tags: ['vue', 'composition-api', 'options-api', 'best-practices'],
             domainId: webDevDomain._id,
             subdomainId: frontendSubdomain._id,
             categoryId: uiCssCategory._id,
-            techStackId: reactTechStack._id,
-            languageId: jsLanguage._id,
+            techStackId: vueStack._id,
         });
 
-        const problem4 = await Problem.create({
+        await Problem.create({
             title: 'MongoDB connection timeout in production',
             descriptionMarkdown: `# Problem
 
@@ -324,7 +367,13 @@ MongooseServerSelectionError: connect ETIMEDOUT
 1. **IP Whitelist**: Add your deployment server's IP to MongoDB Atlas Network Access
 2. **Connection String**: Ensure \`retryWrites=true&w=majority\` parameters are present
 3. **Environment Variables**: Verify MONGODB_URI is correctly set in production
-4. **Network Issues**: Check firewall rules and VPC settings`,
+4. **Network Issues**: Check firewall rules and VPC settings
+
+## Example Connection String
+
+\`\`\`
+mongodb+srv://username:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
+\`\`\``,
             createdBy: admin._id,
             severity: 'CRITICAL',
             difficulty: 'ADVANCED',
@@ -340,56 +389,354 @@ MongooseServerSelectionError: connect ETIMEDOUT
             techStackId: nodeTechStack._id,
         });
 
-        const problem5 = await Problem.create({
-            title: 'JWT token expiration handling in React',
+        await Problem.create({
+            title: 'TypeScript Generic Constraints - How to properly type this function?',
             descriptionMarkdown: `# Problem
 
-How to properly handle JWT token expiration and refresh tokens in a React application?
+I'm trying to create a generic function that filters an array of objects, but TypeScript is complaining about the property access.
 
-## Best Practices
+## Code
 
-1. Store access token in memory (not localStorage for security)
-2. Use refresh token stored in httpOnly cookie
-3. Intercept 401 responses to trigger token refresh
-4. Implement retry logic for failed requests
+\`\`\`typescript
+function filterByProperty<T>(items: T[], key: string, value: any): T[] {
+  return items.filter(item => item[key] === value);
+  // Error: Element implicitly has an 'any' type
+}
+\`\`\`
 
-## Example with Axios
+## Solution
 
-\`\`\`javascript
-axios.interceptors.response.use(
-  response => response,
-  async error => {
-    if (error.response?.status === 401) {
-      // Try refreshing token
-      const newToken = await refreshAccessToken();
-      error.config.headers.Authorization = \`Bearer \${newToken}\`;
-      return axios(error.config);
-    }
-    return Promise.reject(error);
-  }
-);
+Use generic constraints with \`keyof\`:
+
+\`\`\`typescript
+function filterByProperty<T, K extends keyof T>(
+  items: T[], 
+  key: K, 
+  value: T[K]
+): T[] {
+  return items.filter(item => item[key] === value);
+}
+
+// Usage with full type safety
+const users = [{ name: 'Alice', age: 25 }, { name: 'Bob', age: 30 }];
+const filtered = filterByProperty(users, 'name', 'Alice'); // ✅ Works!
 \`\`\``,
             createdBy: testUser._id,
+            severity: 'MEDIUM',
+            difficulty: 'ADVANCED',
+            canonical: true,
+            solved: true,
+            upvotes: 88,
+            downvotes: 3,
+            viewCount: 2100,
+            tags: ['typescript', 'generics', 'type-safety', 'advanced'],
+            domainId: webDevDomain._id,
+            subdomainId: frontendSubdomain._id,
+            categoryId: uiCssCategory._id,
+            techStackId: reactTechStack._id,
+            languageId: tsLanguage._id,
+        });
+
+        await Problem.create({
+            title: 'Understanding Python Pandas GroupBy for Data Aggregation',
+            descriptionMarkdown: `# Question
+
+How do I use pandas \`groupby()\` to calculate multiple aggregations on different columns?
+
+## Problem
+
+I have a DataFrame with sales data and want to group by region, then calculate:
+- Total sales (sum)
+- Average price (mean)
+- Number of transactions (count)
+
+## Solution
+
+\`\`\`python
+import pandas as pd
+
+# Sample data
+df = pd.DataFrame({
+    'region': ['North', 'South', 'North', 'South'],
+    'sales': [100, 200, 150, 250],
+    'price': [10, 20, 15, 25]
+})
+
+# Multiple aggregations
+result = df.groupby('region').agg({
+    'sales': 'sum',
+    'price': 'mean',
+    'region': 'count'
+}).rename(columns={'region': 'count'})
+
+print(result)
+\`\`\`
+
+## Output
+
+\`\`\`
+        sales  price  count
+region                     
+North     250   12.5      2
+South     450   22.5      2
+\`\`\``,
+            createdBy: user3._id,
             severity: 'MEDIUM',
             difficulty: 'INTERMEDIATE',
             canonical: false,
             solved: true,
-            upvotes: 75,
-            downvotes: 4,
-            viewCount: 2500,
-            tags: ['jwt', 'authentication', 'security', 'react', 'axios'],
+            upvotes: 65,
+            downvotes: 1,
+            viewCount: 1800,
+            tags: ['python', 'pandas', 'data-analysis', 'groupby', 'aggregation'],
+            domainId: dataScienceDomain._id,
+            subdomainId: mlSubdomain._id,
+            categoryId: dataAnalysisCategory._id,
+            techStackId: pythonStack._id,
+        });
+
+        await Problem.create({
+            title: 'React Native FlatList performance issues with large datasets',
+            descriptionMarkdown: `# Problem
+
+My React Native app becomes slow and laggy when rendering a FlatList with 1000+ items.
+
+## Symptoms
+
+- Scrolling is choppy
+- App freezes when loading data
+- High memory usage
+
+## Solutions
+
+### 1. Use getItemLayout for fixed-size items
+
+\`\`\`javascript
+<FlatList
+  data={items}
+  getItemLayout={(data, index) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  })}
+/>
+\`\`\`
+
+### 2. Implement pagination
+
+\`\`\`javascript
+const [page, setPage] = useState(1);
+const ITEMS_PER_PAGE = 20;
+
+<FlatList
+  data={items.slice(0, page * ITEMS_PER_PAGE)}
+  onEndReached={() => setPage(p => p + 1)}
+  onEndReachedThreshold={0.5}
+/>
+\`\`\`
+
+### 3. Use React.memo for list items
+
+\`\`\`javascript
+const ListItem = React.memo(({ item }) => (
+  <View>
+    <Text>{item.title}</Text>
+  </View>
+));
+\`\`\``,
+            createdBy: testUser._id,
+            severity: 'HIGH',
+            difficulty: 'INTERMEDIATE',
+            canonical: false,
+            solved: false,
+            upvotes: 42,
+            downvotes: 0,
+            viewCount: 980,
+            tags: ['react-native', 'performance', 'flatlist', 'optimization'],
+            domainId: mobileDomain._id,
+            subdomainId: crossPlatformSubdomain._id,
+            categoryId: mobileFrameworkCategory._id,
+            techStackId: reactNativeStack._id,
+        });
+
+        await Problem.create({
+            title: 'Express middleware execution order causing authentication issues',
+            descriptionMarkdown: `# Problem
+
+My authentication middleware isn't working correctly. Some routes are accessible without authentication.
+
+## Wrong Order
+
+\`\`\`javascript
+app.use('/api/posts', postRoutes); // ❌ Routes registered first
+app.use(authMiddleware); // Auth middleware added after routes!
+\`\`\`
+
+The middleware only applies to routes registered AFTER it.
+
+## Correct Order
+
+\`\`\`javascript
+// 1. Global middleware first
+app.use(express.json());
+app.use(cors());
+
+// 2. Authentication middleware
+app.use(authMiddleware);
+
+// 3. Routes last
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
+\`\`\`
+
+## Per-Route Authentication
+
+\`\`\`javascript
+router.get('/public', publicHandler);
+router.get('/protected', authMiddleware, protectedHandler);
+\`\`\``,
+            createdBy: admin._id,
+            severity: 'CRITICAL',
+            difficulty: 'BEGINNER',
+            canonical: true,
+            solved: true,
+            upvotes: 110,
+            downvotes: 2,
+            viewCount: 3200,
+            tags: ['express', 'middleware', 'authentication', 'security', 'nodejs'],
             domainId: webDevDomain._id,
-            subdomainId: frontendSubdomain._id,
+            subdomainId: backendSubdomain._id,
+            categoryId: apiCategory._id,
+            techStackId: nodeTechStack._id,
+        });
+
+        await Problem.create({
+            title: 'Scikit-learn train_test_split not shuffling data correctly',
+            descriptionMarkdown: `# Problem
+
+When splitting my dataset, the training and test sets aren't properly randomized, causing poor model performance.
+
+## Issue
+
+\`\`\`python
+from sklearn.model_selection import train_test_split
+
+# ❌ Not shuffled by default in older versions
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+\`\`\`
+
+## Solution
+
+\`\`\`python
+# ✅ Explicitly enable shuffling and set random_state
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, 
+    test_size=0.2, 
+    shuffle=True,
+    random_state=42  # For reproducibility
+)
+\`\`\`
+
+## Best Practices
+
+1. **Always set \`random_state\`** for reproducible results
+2. **Use \`stratify\`** for imbalanced datasets
+
+\`\`\`python
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, 
+    test_size=0.2,
+    stratify=y,  # Maintains class distribution
+    random_state=42
+)
+\`\`\``,
+            createdBy: user3._id,
+            severity: 'HIGH',
+            difficulty: 'INTERMEDIATE',
+            canonical: false,
+            solved: true,
+            upvotes: 38,
+            downvotes: 1,
+            viewCount: 750,
+            tags: ['python', 'scikit-learn', 'machine-learning', 'data-split'],
+            domainId: dataScienceDomain._id,
+            subdomainId: mlSubdomain._id,
+            categoryId: dataAnalysisCategory._id,
+            techStackId: pythonStack._id,
+        });
+
+        await Problem.create({
+            title: 'Async/await error handling in Node.js Express routes',
+            descriptionMarkdown: `# Problem
+
+Unhandled promise rejections in async Express routes crash my server.
+
+## The Issue
+
+\`\`\`javascript
+app.get('/users', async (req, res) => {
+  const users = await User.find(); // If this fails, server crashes!
+  res.json(users);
+});
+\`\`\`
+
+## Solutions
+
+### 1. Try-Catch in every route
+
+\`\`\`javascript
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+\`\`\`
+
+### 2. Async wrapper middleware (Better!)
+
+\`\`\`javascript
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+app.get('/users', asyncHandler(async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+}));
+
+// Global error handler
+app.use((err, req, res, next) => {
+  res.status(500).json({ error: err.message });
+});
+\`\`\``,
+            createdBy: admin._id,
+            severity: 'CRITICAL',
+            difficulty: 'INTERMEDIATE',
+            canonical: true,
+            solved: true,
+            upvotes: 95,
+            downvotes: 2,
+            viewCount: 2800,
+            tags: ['nodejs', 'express', 'async-await', 'error-handling', 'promises'],
+            domainId: webDevDomain._id,
+            subdomainId: backendSubdomain._id,
+            categoryId: apiCategory._id,
+            techStackId: nodeTechStack._id,
         });
 
         console.log('✅ Seed data created successfully!');
         console.log('\n📊 Summary:');
-        console.log(`   Users: 2 (admin@studenthub.com, test@example.com)`);
-        console.log(`   Domains: 2`);
-        console.log(`   Problems: 5 (2 canonical)`);
+        console.log(`   Users: 3`);
+        console.log(`   Domains: 3 (Web Dev, Data Science, Mobile)`);
+        console.log(`   Problems: 10 (across multiple tech stacks)`);
+        console.log(`   Tech Stacks: React, Vue.js, Node.js, Python, React Native`);
         console.log('\n🔑 Login credentials:');
         console.log(`   Admin: admin@studenthub.com / admin123`);
-        console.log(`   User:  test@example.com / test123`);
+        console.log(`   User:  alice@example.com / test123`);
+        console.log(`   User:  bob@example.com / test123`);
 
         await mongoose.disconnect();
         console.log('\n✅ Database seeded successfully!');

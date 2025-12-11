@@ -186,14 +186,21 @@ router.get('/:id', apiLimiter, optionalAuth, async (req: AuthRequest, res) => {
             return res.status(404).json({ error: 'Problem not found' });
         }
 
+
         // Get answers
         const answers = await Answer.find({ problemId: problem._id })
             .populate('authorId', 'name avatarUrl roles')
             .sort({ accepted: -1, upvotes: -1 })
             .lean();
 
-        // Get comments for problem
-        const comments = await Comment.find({ parentId: problem._id, parentType: 'Problem' })
+        // Get ALL comments (for problem and all answers)
+        const answerIds = answers.map(a => a._id);
+        const comments = await Comment.find({
+            $or: [
+                { parentId: problem._id, parentType: 'Problem' },
+                { parentId: { $in: answerIds }, parentType: 'Answer' }
+            ]
+        })
             .populate('authorId', 'name avatarUrl')
             .sort({ createdAt: 1 })
             .lean();
