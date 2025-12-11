@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, TrendingUp, TrendingDown, Eye, Calendar, User, ExternalLink, CheckCircle, Edit, Trash2, Send, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import Navbar from '../components/Navbar';
+import apiClient from '../services/api';
 
 interface Problem {
     _id: string;
@@ -107,7 +106,7 @@ function ProblemDetail() {
 
     const fetchProblem = async () => {
         try {
-            const response = await axios.get(`${API_URL}/problems/${id}`);
+            const response = await apiClient.get(`/problems/${id}`);
             setProblem(response.data.problem);
             setAnswers(response.data.answers || []);
             setComments(response.data.comments || []);
@@ -130,15 +129,7 @@ function ProblemDetail() {
 
         setVoting(true);
         try {
-            await axios.post(
-                '${API_URL}/problems/vote',
-                { targetType, targetId, value },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.post('/problems/vote', { targetType, targetId, value });
 
             // Refresh problem data
             await fetchProblem();
@@ -155,15 +146,7 @@ function ProblemDetail() {
 
         setSubmittingAnswer(true);
         try {
-            await axios.post(
-                `${API_URL}/problems/${id}/answers`,
-                { contentMarkdown: answerContent },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.post(`/problems/${id}/answers`, { contentMarkdown: answerContent });
 
             setAnswerContent('');
             await fetchProblem();
@@ -181,19 +164,11 @@ function ProblemDetail() {
 
         setSubmittingComment(true);
         try {
-            await axios.post(
-                '${API_URL}/problems/comment',
-                {
-                    parentType: commentingOn.type,
-                    parentId: commentingOn.id,
-                    content: commentContent,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.post('/problems/comment', {
+                parentType: commentingOn.type,
+                parentId: commentingOn.id,
+                content: commentContent,
+            });
 
             setCommentContent('');
             setCommentingOn(null);
@@ -209,15 +184,7 @@ function ProblemDetail() {
         if (!user) return;
 
         try {
-            await axios.post(
-                `${API_URL}/problems/${id}/answers/${answerId}/accept`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.post(`/problems/${id}/answers/${answerId}/accept`);
 
             await fetchProblem();
         } catch (err: any) {
@@ -230,14 +197,7 @@ function ProblemDetail() {
 
         setDeleting(true);
         try {
-            await axios.delete(
-                `${API_URL}/problems/${id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.delete(`/problems/${id}`);
             navigate('/home');
         } catch (err: any) {
             console.error('Delete failed:', err);

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { TrendingUp, Eye, Calendar, Award, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import Navbar from '../components/Navbar';
+import apiClient from '../services/api';
 
 interface Problem {
     _id: string;
@@ -50,7 +50,7 @@ function Home() {
 
     const fetchProblems = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/problems');
+            const response = await apiClient.get('/problems');
             // Get latest 10 problems for the feed
             setProblems((response.data.problems || []).slice(0, 10));
             setLoading(false);

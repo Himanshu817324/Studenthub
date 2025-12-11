@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../services/api';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import Navbar from '../components/Navbar';
+import apiClient from '../services/api';
 
 interface FormData {
     title: string;
@@ -45,7 +44,7 @@ function PostEdit() {
 
     const fetchProblem = async () => {
         try {
-            const response = await axios.get(`${API_URL}/problems/${id}`);
+            const response = await apiClient.get(`/problems/${id}`);
             const problem = response.data.problem || response.data;
 
             // Check if user is authorized to edit
@@ -88,15 +87,7 @@ function PostEdit() {
         setError('');
 
         try {
-            await axios.patch(
-                `${API_URL}/problems/${id}`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            await apiClient.patch(`/problems/${id}`, formData);
 
             // Redirect back to the problem detail page
             navigate(`/problems/${id}`);

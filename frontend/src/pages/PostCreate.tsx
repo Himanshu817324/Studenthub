@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { ArrowLeft, Send, Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import Navbar from '../components/Navbar';
+import apiClient from '../services/api';
 
 interface FormData {
     title: string;
@@ -51,15 +51,7 @@ function PostCreate() {
         setError('');
 
         try {
-            const response = await axios.post(
-                '${API_URL}/problems',
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                }
-            );
+            const response = await apiClient.post('/problems', formData);
 
             // Redirect to the newly created problem
             navigate(`/problems/${response.data._id}`);

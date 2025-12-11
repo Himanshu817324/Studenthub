@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { TrendingUp, Users, Eye, MessageCircle, Filter, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
+import apiClient from '../services/api';
 
 interface Problem {
     _id: string;
@@ -80,7 +80,7 @@ function Explore() {
 
     const fetchDomains = async () => {
         try {
-            const response = await axios.get('${API_URL}/domains');
+            const response = await apiClient.get('/domains');
             setDomains(response.data);
         } catch (err) {
             console.error('Failed to fetch domains:', err);
@@ -99,7 +99,7 @@ function Explore() {
             if (filters.domainId) params.domainId = filters.domainId;
             if (filters.sort) params.sort = filters.sort;
 
-            const response = await axios.get('${API_URL}/problems', { params });
+            const response = await apiClient.get('/problems', { params });
             setProblems(response.data.problems || []);
             setLoading(false);
         } catch (err: any) {

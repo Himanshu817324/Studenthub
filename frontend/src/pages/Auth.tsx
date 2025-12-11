@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { BookOpen } from 'lucide-react';
+import { API_URL } from '../services/api';
 
 function Auth() {
     const location = useLocation();
@@ -120,7 +121,7 @@ function Auth() {
                     <button
                         type="button"
                         onClick={() => {
-                            window.location.href = `${import.meta.env.VITE_API_URL || '${API_URL}'}/auth/google`;
+                            window.location.href = `${import.meta.env.VITE_API_URL || API_URL}/auth/google`;
                         }}
                         className="mt-4 w-full btn-secondary flex items-center justify-center"
                     >
