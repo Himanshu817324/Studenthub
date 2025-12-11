@@ -7,6 +7,7 @@ export interface User {
     roles: string[];
     bio?: string;
     interests: string[];
+    createdAt?: string;
 }
 
 // Classification types

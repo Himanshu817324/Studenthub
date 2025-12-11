@@ -97,7 +97,6 @@ function ProblemDetail() {
 
     // User votes
     const [userVote, setUserVote] = useState<number | null>(null);
-    const [answerVotes, setAnswerVotes] = useState<{ [key: string]: number }>({});
 
     useEffect(() => {
         if (id) {
