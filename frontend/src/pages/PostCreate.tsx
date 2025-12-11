@@ -52,7 +52,7 @@ function PostCreate() {
 
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/problems',
+                '${API_URL}/problems',
                 formData,
                 {
                     headers: {

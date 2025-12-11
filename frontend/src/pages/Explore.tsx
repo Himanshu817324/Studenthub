@@ -80,7 +80,7 @@ function Explore() {
 
     const fetchDomains = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/domains');
+            const response = await axios.get('${API_URL}/domains');
             setDomains(response.data);
         } catch (err) {
             console.error('Failed to fetch domains:', err);
@@ -99,7 +99,7 @@ function Explore() {
             if (filters.domainId) params.domainId = filters.domainId;
             if (filters.sort) params.sort = filters.sort;
 
-            const response = await axios.get('http://localhost:5000/api/problems', { params });
+            const response = await axios.get('${API_URL}/problems', { params });
             setProblems(response.data.problems || []);
             setLoading(false);
         } catch (err: any) {

@@ -44,7 +44,7 @@ function PostEdit() {
 
     const fetchProblem = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/problems/${id}`);
+            const response = await axios.get(`${API_URL}/problems/${id}`);
             const problem = response.data.problem || response.data;
 
             // Check if user is authorized to edit
@@ -88,7 +88,7 @@ function PostEdit() {
 
         try {
             await axios.patch(
-                `http://localhost:5000/api/problems/${id}`,
+                `${API_URL}/problems/${id}`,
                 formData,
                 {
                     headers: {

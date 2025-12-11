@@ -120,7 +120,7 @@ function Auth() {
                     <button
                         type="button"
                         onClick={() => {
-                            window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+                            window.location.href = `${import.meta.env.VITE_API_URL || '${API_URL}'}/auth/google`;
                         }}
                         className="mt-4 w-full btn-secondary flex items-center justify-center"
                     >

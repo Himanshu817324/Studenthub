@@ -106,7 +106,7 @@ function ProblemDetail() {
 
     const fetchProblem = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/problems/${id}`);
+            const response = await axios.get(`${API_URL}/problems/${id}`);
             setProblem(response.data.problem);
             setAnswers(response.data.answers || []);
             setComments(response.data.comments || []);
@@ -130,7 +130,7 @@ function ProblemDetail() {
         setVoting(true);
         try {
             await axios.post(
-                'http://localhost:5000/api/problems/vote',
+                '${API_URL}/problems/vote',
                 { targetType, targetId, value },
                 {
                     headers: {
@@ -155,7 +155,7 @@ function ProblemDetail() {
         setSubmittingAnswer(true);
         try {
             await axios.post(
-                `http://localhost:5000/api/problems/${id}/answers`,
+                `${API_URL}/problems/${id}/answers`,
                 { contentMarkdown: answerContent },
                 {
                     headers: {
@@ -181,7 +181,7 @@ function ProblemDetail() {
         setSubmittingComment(true);
         try {
             await axios.post(
-                'http://localhost:5000/api/problems/comment',
+                '${API_URL}/problems/comment',
                 {
                     parentType: commentingOn.type,
                     parentId: commentingOn.id,
@@ -209,7 +209,7 @@ function ProblemDetail() {
 
         try {
             await axios.post(
-                `http://localhost:5000/api/problems/${id}/answers/${answerId}/accept`,
+                `${API_URL}/problems/${id}/answers/${answerId}/accept`,
                 {},
                 {
                     headers: {
@@ -230,7 +230,7 @@ function ProblemDetail() {
         setDeleting(true);
         try {
             await axios.delete(
-                `http://localhost:5000/api/problems/${id}`,
+                `${API_URL}/problems/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
