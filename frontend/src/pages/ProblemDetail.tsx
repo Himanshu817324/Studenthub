@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, TrendingUp, TrendingDown, Eye, Calendar, User, ExternalLink, CheckCircle, Edit, Trash2, Send, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
