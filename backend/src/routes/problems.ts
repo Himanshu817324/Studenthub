@@ -483,7 +483,8 @@ router.post(
                     const model = targetType === 'Problem' ? Problem : targetType === 'Answer' ? Answer : null;
                     if (model) {
                         const field = value === 1 ? 'upvotes' : 'downvotes';
-                        await model.findByIdAndUpdate(targetId, { $inc: { [field]: -1 } });
+                        //  @ts-expect-error - Mongoose typing issue with dynamic field names
+                        await model.findByIdAndUpdate(targetId, { $inc: { [field]: -1 } } as any);
                     }
 
                     return res.json({ message: 'Vote removed', voted: false });
@@ -497,9 +498,10 @@ router.post(
                     if (model) {
                         const incrementField = value === 1 ? 'upvotes' : 'downvotes';
                         const decrementField = value === 1 ? 'downvotes' : 'upvotes';
+                        // @ts-expect-error - Mongoose typing issue with dynamic field names
                         await model.findByIdAndUpdate(targetId, {
                             $inc: { [incrementField]: 1, [decrementField]: -1 },
-                        });
+                        } as any);
                     }
 
                     return res.json({ message: 'Vote changed', voted: true, value });
@@ -518,7 +520,8 @@ router.post(
             const model = targetType === 'Problem' ? Problem : targetType === 'Answer' ? Answer : null;
             if (model) {
                 const field = value === 1 ? 'upvotes' : 'downvotes';
-                await model.findByIdAndUpdate(targetId, { $inc: { [field]: 1 } });
+                // @ts-expect-error - Mongoose typing issue with dynamic field names
+                await model.findByIdAndUpdate(targetId, { $inc: { [field]: 1 } } as any);
             }
 
             res.json({ message: 'Vote recorded', voted: true, value });
