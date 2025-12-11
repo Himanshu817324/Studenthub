@@ -63,7 +63,8 @@ function ProblemDetail() {
     const fetchProblem = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/api/problems/${id}`);
-            setProblem(response.data);
+            // Backend returns { problem, answers, comments }
+            setProblem(response.data.problem || response.data);
             setLoading(false);
         } catch (err: any) {
             console.error('Failed to fetch problem:', err);
@@ -111,13 +112,29 @@ function ProblemDetail() {
         );
     }
 
-    if (error || !problem) {
+    if (error) {
         return (
             <>
                 <Navbar />
                 <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
                     <div className="glass-card p-8 max-w-md text-center">
-                        <p className="text-red-600 mb-4">❌ {error || 'Problem not found'}</p>
+                        <p className="text-red-600 mb-4">❌ {error}</p>
+                        <Link to="/explore" className="btn-primary inline-block">
+                            Back to Explore
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    if (!problem) {
+        return (
+            <>
+                <Navbar />
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
+                    <div className="glass-card p-8 max-w-md text-center">
+                        <p className="text-red-600 mb-4">❌ Problem not found</p>
                         <Link to="/explore" className="btn-primary inline-block">
                             Back to Explore
                         </Link>
@@ -175,7 +192,7 @@ function ProblemDetail() {
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6 pb-6 border-b border-gray-200">
                             <div className="flex items-center space-x-2">
                                 <User className="w-4 h-4" />
-                                <span>Posted by <strong>{problem.createdBy.name}</strong></span>
+                                <span>Posted by <strong>{problem.createdBy?.name || 'Unknown'}</strong></span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Calendar className="w-4 h-4" />
@@ -183,7 +200,7 @@ function ProblemDetail() {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Eye className="w-4 h-4" />
-                                <span>{problem.viewCount} views</span>
+                                <span>{problem.viewCount || 0} views</span>
                             </div>
                         </div>
 
@@ -238,7 +255,7 @@ function ProblemDetail() {
 
                         {/* Tags */}
                         <div className="flex flex-wrap gap-2 mb-6">
-                            {problem.tags.map((tag) => (
+                            {(problem.tags || []).map((tag) => (
                                 <span
                                     key={tag}
                                     className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-md"
