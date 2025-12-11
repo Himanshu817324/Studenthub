@@ -1,7 +1,7 @@
 {
-  "name": "studenthub-backend",
+  "name": "codecrew-backend",
   "version": "1.0.0",
-  "description": "Backend API for Student Doubt Community",
+  "description": "Backend API for CodeCrew Developer Community",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only src/server.ts",

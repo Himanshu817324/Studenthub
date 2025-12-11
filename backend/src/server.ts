@@ -71,7 +71,7 @@ app.get('/health', (req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({
-        message: 'Student Doubt Community API',
+        message: 'CodeCrew API - Developer Community Platform',
         version: '1.0.0',
         endpoints: {
             auth: '/api/auth',

@@ -10,7 +10,7 @@ function Landing() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
                         <BookOpen className="w-8 h-8 text-primary" />
-                        <span className="text-2xl font-bold text-gray-900">StudentHub</span>
+                        <span className="text-2xl font-bold text-gray-900">CodeCrew</span>
                     </div>
                     <div className="flex space-x-4">
                         <Link to="/login" className="btn-secondary">
@@ -35,8 +35,8 @@ function Landing() {
                         <span className="text-primary"> Together</span>
                     </h1>
                     <p className="text-xl text-gray-600 mb-10">
-                        A Reddit-style community for students to share, discuss, and solve coding problems.
-                        Learn from canonical solutions and help others grow.
+                        A developer community where coders unite to share, discuss, and solve programming challenges.
+                        Learn from canonical solutions and grow together.
                     </p>
                     <div className="flex justify-center space-x-4">
                         <Link to="/signup" className="btn-primary text-lg px-8 py-3">
