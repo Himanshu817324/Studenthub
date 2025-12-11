@@ -314,6 +314,45 @@ router.patch(
     }
 );
 
+// Delete problem
+router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
+    try {
+        const problem = await Problem.findById(req.params.id);
+
+        if (!problem) {
+            return res.status(404).json({ error: 'Problem not found' });
+        }
+
+        // Only creator or admin can delete
+        const isCreator = problem.createdBy.toString() === req.user!._id.toString();
+        const isAdmin = req.user!.roles.includes('admin');
+
+        if (!isCreator && !isAdmin) {
+            return res.status(403).json({ error: 'Not authorized to delete this problem' });
+        }
+
+        // Delete all associated data
+        await Promise.all([
+            // Delete all answers to this problem
+            Answer.deleteMany({ problemId: req.params.id }),
+            // Delete all comments on this problem
+            Comment.deleteMany({ parentId: req.params.id, parentType: 'Problem' }),
+            // Delete all votes on this problem
+            Vote.deleteMany({ targetId: req.params.id, targetType: 'Problem' }),
+            // Delete all bookmarks of this problem
+            Bookmark.deleteMany({ targetId: req.params.id, targetType: 'Problem' }),
+        ]);
+
+        // Delete the problem itself
+        await Problem.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'Problem and associated data deleted successfully' });
+    } catch (error) {
+        console.error('Delete problem error:', error);
+        res.status(500).json({ error: 'Failed to delete problem' });
+    }
+});
+
 // Mark problem as solved
 router.post('/:id/solve', authenticate, async (req: AuthRequest, res) => {
     try {

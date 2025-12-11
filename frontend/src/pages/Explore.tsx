@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { TrendingUp, Users, Eye, MessageCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { TrendingUp, Users, Eye, MessageCircle, Filter, X, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 
 interface Problem {
@@ -25,6 +25,21 @@ interface Problem {
     createdAt: string;
 }
 
+interface Domain {
+    _id: string;
+    name: string;
+}
+
+interface Filters {
+    search: string;
+    severity: string;
+    difficulty: string;
+    canonical: string;
+    solved: string;
+    sort: string;
+    domainId: string;
+}
+
 const severityColors = {
     CRITICAL: 'bg-red-500/10 text-red-700 border-red-200',
     HIGH: 'bg-orange-500/10 text-orange-700 border-orange-200',
@@ -42,14 +57,49 @@ function Explore() {
     const [problems, setProblems] = useState<Problem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+    const [domains, setDomains] = useState<Domain[]>([]);
+
+    const [filters, setFilters] = useState<Filters>({
+        search: '',
+        severity: '',
+        difficulty: '',
+        canonical: '',
+        solved: '',
+        sort: 'newest',
+        domainId: '',
+    });
+
+    useEffect(() => {
+        fetchDomains();
+    }, []);
 
     useEffect(() => {
         fetchProblems();
-    }, []);
+    }, [filters]);
+
+    const fetchDomains = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/domains');
+            setDomains(response.data);
+        } catch (err) {
+            console.error('Failed to fetch domains:', err);
+        }
+    };
 
     const fetchProblems = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/problems');
+            // Build query params
+            const params: any = {};
+            if (filters.search) params.search = filters.search;
+            if (filters.severity) params.severity = filters.severity;
+            if (filters.difficulty) params.difficulty = filters.difficulty;
+            if (filters.canonical) params.canonical = filters.canonical;
+            if (filters.solved) params.solved = filters.solved;
+            if (filters.domainId) params.domainId = filters.domainId;
+            if (filters.sort) params.sort = filters.sort;
+
+            const response = await axios.get('http://localhost:5000/api/problems', { params });
             setProblems(response.data.problems || []);
             setLoading(false);
         } catch (err: any) {
@@ -58,6 +108,24 @@ function Explore() {
             setLoading(false);
         }
     };
+
+    const handleFilterChange = (key: keyof Filters, value: string) => {
+        setFilters({ ...filters, [key]: value });
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            search: '',
+            severity: '',
+            difficulty: '',
+            canonical: '',
+            solved: '',
+            sort: 'newest',
+            domainId: '',
+        });
+    };
+
+    const activeFilterCount = Object.values(filters).filter(v => v && v !== 'newest').length;
 
     if (loading) {
         return (
@@ -104,7 +172,7 @@ function Explore() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div className="glass-card p-4">
                             <div className="flex items-center space-x-3">
                                 <div className="p-2 bg-primary/10 rounded-lg">
@@ -157,11 +225,217 @@ function Explore() {
                         </div>
                     </div>
 
+                    {/* Search and Filter Bar */}
+                    <div className="glass-card p-4 mb-6">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            {/* Search */}
+                            <div className="flex-1 relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    value={filters.search}
+                                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                                    placeholder="Search problems..."
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                />
+                            </div>
+
+                            {/* Filter Buttons */}
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    <Filter className="w-4 h-4" />
+                                    <span>Filters</span>
+                                    {activeFilterCount > 0 && (
+                                        <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
+                                            {activeFilterCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {activeFilterCount > 0 && (
+                                    <button
+                                        onClick={clearFilters}
+                                        className="flex items-center space-x-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <X className="w-4 h-4" />
+                                        <span>Clear</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Filter Panel */}
+                        <AnimatePresence>
+                            {showFilters && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+                                        {/* Severity Filter */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Severity
+                                            </label>
+                                            <select
+                                                value={filters.severity}
+                                                onChange={(e) => handleFilterChange('severity', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">All Severities</option>
+                                                <option value="CRITICAL">Critical</option>
+                                                <option value="HIGH">High</option>
+                                                <option value="MEDIUM">Medium</option>
+                                                <option value="LOW">Low</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Difficulty Filter */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Difficulty
+                                            </label>
+                                            <select
+                                                value={filters.difficulty}
+                                                onChange={(e) => handleFilterChange('difficulty', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">All Difficulties</option>
+                                                <option value="BEGINNER">Beginner</option>
+                                                <option value="INTERMEDIATE">Intermediate</option>
+                                                <option value="ADVANCED">Advanced</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Domain Filter */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Domain
+                                            </label>
+                                            <select
+                                                value={filters.domainId}
+                                                onChange={(e) => handleFilterChange('domainId', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">All Domains</option>
+                                                {domains.map((domain) => (
+                                                    <option key={domain._id} value={domain._id}>
+                                                        {domain.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Solved Status */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Status
+                                            </label>
+                                            <select
+                                                value={filters.solved}
+                                                onChange={(e) => handleFilterChange('solved', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">All Problems</option>
+                                                <option value="true">Solved Only</option>
+                                                <option value="false">Unsolved Only</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Canonical Filter */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Type
+                                            </label>
+                                            <select
+                                                value={filters.canonical}
+                                                onChange={(e) => handleFilterChange('canonical', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="">All Types</option>
+                                                <option value="true">Canonical Only</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Sort Order */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Sort By
+                                            </label>
+                                            <select
+                                                value={filters.sort}
+                                                onChange={(e) => handleFilterChange('sort', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            >
+                                                <option value="newest">Newest First</option>
+                                                <option value="oldest">Oldest First</option>
+                                                <option value="popular">Most Popular</option>
+                                                <option value="views">Most Viewed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Active Filters Display */}
+                    {activeFilterCount > 0 && (
+                        <div className="mb-4 flex flex-wrap gap-2">
+                            {filters.severity && (
+                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center space-x-1">
+                                    <span>Severity: {filters.severity}</span>
+                                    <button onClick={() => handleFilterChange('severity', '')} className="hover:text-blue-900">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            )}
+                            {filters.difficulty && (
+                                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center space-x-1">
+                                    <span>Difficulty: {filters.difficulty}</span>
+                                    <button onClick={() => handleFilterChange('difficulty', '')} className="hover:text-purple-900">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            )}
+                            {filters.solved && (
+                                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center space-x-1">
+                                    <span>{filters.solved === 'true' ? 'Solved' : 'Unsolved'}</span>
+                                    <button onClick={() => handleFilterChange('solved', '')} className="hover:text-green-900">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            )}
+                            {filters.canonical && (
+                                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm flex items-center space-x-1">
+                                    <span>Canonical</span>
+                                    <button onClick={() => handleFilterChange('canonical', '')} className="hover:text-yellow-900">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            )}
+                            {filters.domainId && (
+                                <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm flex items-center space-x-1">
+                                    <span>Domain: {domains.find(d => d._id === filters.domainId)?.name}</span>
+                                    <button onClick={() => handleFilterChange('domainId', '')} className="hover:text-gray-900">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            )}
+                        </div>
+                    )}
+
                     {/* Problems List */}
                     {problems.length === 0 ? (
                         <div className="glass-card p-12 text-center">
                             <p className="text-gray-600 text-lg">No problems found</p>
-                            <p className="text-gray-500 mt-2">Be the first to post a problem!</p>
+                            <p className="text-gray-500 mt-2">Try adjusting your filters</p>
                         </div>
                     ) : (
                         <div className="space-y-4">

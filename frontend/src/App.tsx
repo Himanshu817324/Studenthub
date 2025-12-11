@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 
@@ -10,6 +9,7 @@ import Explore from './pages/Explore';
 import MajorProblems from './pages/MajorProblems';
 import ProblemDetail from './pages/ProblemDetail';
 import PostCreate from './pages/PostCreate';
+import PostEdit from './pages/PostEdit';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -33,7 +33,15 @@ function App() {
                 <Route path="/problems/major" element={<MajorProblems />} />
                 <Route path="/problems/:id" element={<ProblemDetail />} />
                 <Route
+                    path="/problems/:id/edit"
+                    element={isAuthenticated ? <PostEdit /> : <Navigate to="/login" />}
+                />
+                <Route
                     path="/problems/new"
+                    element={isAuthenticated ? <PostCreate /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/post/create"
                     element={isAuthenticated ? <PostCreate /> : <Navigate to="/login" />}
                 />
                 <Route path="/profile/:userId?" element={<Profile />} />

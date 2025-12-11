@@ -11,6 +11,7 @@ import authRoutes from './routes/auth';
 import classificationRoutes from './routes/classification';
 import problemRoutes from './routes/problems';
 import adminRoutes from './routes/admin';
+import userRoutes from './routes/users';
 
 import { apiLimiter } from './middleware/rateLimiter';
 
@@ -60,6 +61,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', classificationRoutes);
 app.use('/api/problems', problemRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -76,6 +78,7 @@ app.get('/', (req, res) => {
             classification: '/api',
             problems: '/api/problems',
             admin: '/api/admin',
+            users: '/api/users',
         },
     });
 });
