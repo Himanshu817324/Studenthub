@@ -34,7 +34,7 @@ function Auth() {
             <div className="glass-card p-8 w-full max-w-md">
                 <div className="flex items-center justify-center mb-8">
                     <BookOpen className="w-10 h-10 text-primary mr-3" />
-                    <h1 className="text-3xl font-bold">StudentHub</h1>
+                    <h1 className="text-3xl font-bold">CodeCrew</h1>
                 </div>
 
                 <h2 className="text-2xl font-semibold text-center mb-6">
