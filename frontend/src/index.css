@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  
+  body {
+    @apply bg-white text-gray-900 font-sans;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-[16px] rounded-2xl border border-gray-100/50 shadow-lg;
+  }
+
+  .glass-card-dark {
+    @apply bg-gray-900/80 backdrop-blur-[16px] rounded-2xl border border-gray-800/50 shadow-lg;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-xl font-medium hover:bg-primary-700 active:scale-95 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply border border-primary text-primary px-4 py-2 rounded-xl font-medium hover:bg-primary-50 active:scale-95 transition-all duration-200;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all;
+  }
+
+  /* Severity badges */
+  .badge-critical {
+    @apply bg-severity-critical/10 text-severity-critical px-2 py-1 rounded-md text-sm font-medium;
+  }
+
+  .badge-high {
+    @apply bg-severity-high/10 text-severity-high px-2 py-1 rounded-md text-sm font-medium;
+  }
+
+  .badge-medium {
+    @apply bg-severity-medium/10 text-severity-medium px-2 py-1 rounded-md text-sm font-medium;
+  }
+
+  .badge-low {
+    @apply bg-severity-low/10 text-severity-low px-2 py-1 rounded-md text-sm font-medium;
+  }
+}
+
+@layer utilities {
+  .hover-lift {
+    @apply hover:-translate-y-0.5 transition-transform duration-200;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 0.5s ease-in-out;
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}

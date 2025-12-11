@@ -1,0 +1,60 @@
+{
+    "colors": {
+        "primary": {
+            "name": "Indigo",
+            "value": "#4F46E5",
+            "usage": "Primary actions, buttons, links"
+        },
+        "secondary": {
+            "name": "Secondary Indigo",
+            "value": "#6366F1",
+            "usage": "Secondary UI elements"
+        },
+        "accent": {
+            "name": "Neon Blue",
+            "value": "#38BDF8",
+            "usage": "Accents, highlights, interactive elements"
+        },
+        "severity": {
+            "critical": "#EF4444",
+            "high": "#F59E0B",
+            "medium": "#6366F1",
+            "low": "#10B981"
+        },
+        "difficulty": {
+            "beginner": "#10B981",
+            "intermediate": "#F59E0B",
+            "advanced": "#EF4444"
+        }
+    },
+    "typography": {
+        "fontFamily": "Inter",
+        "weights": {
+            "regular": 400,
+            "medium": 500,
+            "semibold": 600,
+            "bold": 700
+        }
+    },
+    "spacing": {
+        "baseline": "16px",
+        "gutters": "24px"
+    },
+    "borderRadius": {
+        "small": "8px",
+        "medium": "12px",
+        "large": "16px",
+        "card": "16px"
+    },
+    "effects": {
+        "glassmorphism": {
+            "blur": "16px",
+            "opacity": 0.8,
+            "border": "1px solid rgba(255, 255, 255, 0.1)"
+        },
+        "shadows": {
+            "card": "0 10px 30px rgba(0, 0, 0, 0.1)",
+            "hover": "0 15px 40px rgba(0, 0, 0, 0.15)"
+        }
+    }
+}
